@@ -78,7 +78,7 @@ def sentiment_analysis(text):
     flash('Emotion metrics')
     flash('Emotion score : {}'.format(sentiment.magnitude))
     flash('Emotion level : {}'.format(emotion_level))
-    flash('Presence of strong content : {}'.format(strong_content))
+    flash('Strong Praise/Criticism : {}'.format(strong_content))
 
 def volume(text):
     #tokenize the review
