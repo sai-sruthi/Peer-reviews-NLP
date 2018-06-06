@@ -1,0 +1,6 @@
+gunicorn
+Flask
+nltk
+request
+google-cloud
+google-cloud-language

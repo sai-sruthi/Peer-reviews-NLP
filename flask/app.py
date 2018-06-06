@@ -5,6 +5,10 @@ from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 
+#python imports
+import os
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
+
 #Import nltk libraries
 from nltk.tokenize import TreebankWordTokenizer
 tokenizer = TreebankWordTokenizer()
