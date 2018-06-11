@@ -1,3 +1,4 @@
+#flask imports
 from flask import Flask,request,render_template, flash
 
 #Google cloud imports
@@ -9,10 +10,12 @@ from google.cloud.language import types
 import os
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
 
-#Import nltk libraries
+#Import nltk libraries for volume analysis
 from nltk.tokenize import TreebankWordTokenizer
 tokenizer = TreebankWordTokenizer()
 from nltk.corpus import stopwords
+
+#set rules for stopwords ignored in volume analysis
 stop_words = set(stopwords.words('english'))
 stop_words |= {'.',',','!','?'}
 
@@ -21,9 +24,9 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '10cr441f27d441f28567d441f2b2018j'
 
-
+#app routes
 @app.route('/', methods=['GET', 'POST'])
-def load_page():
+def renderPage():
     input_text = "Enter Review Text Here!"
     # Normal page load calls 'GET'. 'POST' gets called when one of the buttons is pressed
     if request.method == 'POST':
@@ -40,7 +43,7 @@ def load_page():
     # Render the HTML template. input_text gets fed into the textarea variable in the template
     return render_template('form.html', textarea=input_text)
 
-def sentiment_analysis(text):
+def sentimentAnalysis(text):
     # Instantiates a client
     client = language.LanguageServiceClient()
 
@@ -84,7 +87,7 @@ def sentiment_analysis(text):
     flash('Emotion level : {}'.format(emotion_level))
     flash('Strong Praise/Criticism : {}'.format(strong_content))
 
-def volume(text):
+def volumeAnalysis(text):
     #tokenize the review
     tokens = tokenizer.tokenize(text)
     total_volume = len(tokens)
@@ -99,6 +102,16 @@ def volume(text):
     flash('Total volume of the review: {}'.format(total_volume))
     flash('Actual useful volume of the review: {}'.format(volume_without_stopwords))
     flash('\n')
+
+@app.route('/postjson', methods = ['POST'])
+def postJson():
+    if not request.is_json:
+        print('Error : Request is not in JSON format')
+        return
+    review_text = request.get_json()
+    print('Review text: {}'.format(review_text))
+    return 'JSON Posted'
+
 
 
 if __name__ == '__main__':
