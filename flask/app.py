@@ -1,5 +1,5 @@
 #flask imports
-from flask import Flask,request,render_template, flash,jsonify,json
+from flask import Flask,request,render_template, flash,jsonify
 
 #Google cloud imports
 from google.cloud import language
@@ -161,7 +161,47 @@ def allJson():
     sentiment_tone,sentiment_score = sentimentAnalysis(review_text)
     sentiment_magnitude,emotion_level = emotionAnalysis(review_text)
     praise,criticism = checkRemarks(review_text)
-    return jsonify({'text':review_text,'total_volume':total_volume,'volume_without_stopwords':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_score':sentiment_score,'emotion_score':sentiment_magnitude,'emotion_level':emotion_level,'praise':praise,'criticism':criticism})
+    return jsonify({'text':review_text,'total_volume':total_volume,'useful_volume':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_score':sentiment_score,'emotion_score':sentiment_magnitude,'emotion_level':emotion_level,'praise':praise,'criticism':criticism})
+
+#route to get only volume metrics via JSON request
+@app.route('/volume', methods = ['POST'])
+def volumeJson():
+    if not request.is_json:
+        return 'Error : Request is not in JSON format'
+    review_json = request.get_json()
+    review_text = review_json['text']
+    total_volume,volume_without_stopwords = volumeAnalysis(review_text)
+    return jsonify({'text':review_text,'total_volume':total_volume,'useful_volume':volume_without_stopwords})
+
+#route to get only sentiment metrics via JSON request
+@app.route('/sentiment', methods = ['POST'])
+def sentimentJson():
+    if not request.is_json:
+        return 'Error : Request is not in JSON format'
+    review_json = request.get_json()
+    review_text = review_json['text']
+    sentiment_tone,sentiment_score = sentimentAnalysis(review_text)
+    return jsonify({'text':review_text,'sentiment_tone':sentiment_tone,'sentiment_score':sentiment_score})
+
+#route to get only emotion metrics via JSON request
+@app.route('/emotion', methods = ['POST'])
+def emotionJson():
+    if not request.is_json:
+        return 'Error : Request is not in JSON format'
+    review_json = request.get_json()
+    review_text = review_json['text']
+    sentiment_magnitude,emotion_level = emotionAnalysis(review_text)
+    return jsonify({'text':review_text,'emotion_score':sentiment_magnitude,'emotion_level':emotion_level})
+
+#route to get only praise and criticism remarks via JSON request
+@app.route('/remarks', methods = ['POST'])
+def remarksJson():
+    if not request.is_json:
+        return 'Error : Request is not in JSON format'
+    review_json = request.get_json()
+    review_text = review_json['text']
+    praise,criticism = checkRemarks(review_text)
+    return jsonify({'text':review_text,'praise':praise,'criticism':criticism})
 
 if __name__ == '__main__':
     app.run()
