@@ -4,3 +4,5 @@ nltk
 request
 google-cloud
 google-cloud-language
+json
+jsonify
