@@ -10,9 +10,13 @@ This accepts input text in JSON format and returns all the metrics or a particul
 
 # Here are the various endpoints and url for JSON request:
 https://expertiza-peer-reviews.herokuapp.com/all for all the metrics at once
+
 https://expertiza-peer-reviews.herokuapp.com/volume for all the volume metrics only
+
 https://expertiza-peer-reviews.herokuapp.com/sentiment for all the sentiment metrics only
+
 https://expertiza-peer-reviews.herokuapp.com/emotion for all the emotion metrics only
+
 https://expertiza-peer-reviews.herokuapp.com/remarks for indentifying level of praise and criticism
 
 # Input text is to be given in the following JSON format:
