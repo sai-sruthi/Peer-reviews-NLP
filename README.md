@@ -24,3 +24,15 @@ https://expertiza-peer-reviews.herokuapp.com/remarks for indentifying level of p
 	"text" : "This is an excellent project. Keep up the great work"
             }
 
+# output text will also be in JSON format. Here is an example sent to /all endpoint with the above input text:
+{
+    "criticism": "None",
+    "emotion_level": "High",
+    "emotion_score": 1.8,
+    "praise": "High",
+    "sentiment_score": 0.9,
+    "sentiment_tone": "Positive",
+    "text": "This is an excellent project. Keep up the great work",
+    "total_volume": 10,
+    "useful_volume": 6
+}
