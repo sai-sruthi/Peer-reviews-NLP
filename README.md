@@ -3,9 +3,9 @@ Perform Sentiment,  Volume and Emotion Analysis using NLP on peer reviews.
 
 # Try out a live prototype of this application:
 # https://expertiza-peer-reviews.herokuapp.com/
-# Note: This is just a prototype and the current UI is for demo purposes only and the final UI will be different.
+ Note: This is just a prototype and the current UI is for demo purposes only and the final UI will be different.
 
-# This application also has API endpoints for each of it's metrics and can be used as below:
+This application also has API endpoints for each of it's metrics and can be used as below:
 This accepts input text in JSON format and returns all the metrics or a particular individual metrics as desired
 
 # Here are the various endpoints and url for JSON request:
