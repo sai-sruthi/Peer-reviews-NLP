@@ -1,6 +1,13 @@
 import numpy as np
 import pandas as pd
 import numpy as np
+
+#code to supress all warnings
+import sys, os
+stderr = sys.stderr
+sys.stderr = open(os.devnull, 'w')
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
 from keras.preprocessing import sequence,text
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Embedding, LSTM, Bidirectional, BatchNormalization, Activation
