@@ -19,14 +19,9 @@ batch_size = 64
 
 tok = text.Tokenizer(num_words=200000)
 tok.fit_on_texts(list(df['comment_text']))
-x = tok.texts_to_sequences(df['comment_text'])
-x = sequence.pad_sequences(x, maxlen=maxlen)
-y_cat = to_categorical(df['y_true'], num_classes=3)
-x_train,x_test,y_train,y_test = train_test_split(x,y_cat,test_size=0.25)
-word_index = tok.word_index
 
 model = load_model('model/model-12.hdf5')
-sentences = np.array(["Nothing is mentioned about automated tests."])
+sentences = np.array(["Great project!Wondeful work"])
 test_sentence = tok.texts_to_sequences(sentences)
 test_sentence = sequence.pad_sequences(test_sentence, maxlen=maxlen)
 labels = ['Neutral','Positive','Negative']
