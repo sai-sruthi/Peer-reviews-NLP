@@ -1,0 +1,9 @@
+gunicorn
+Flask
+nltk
+request
+keras
+tensorflow
+jsonify
+numpy
+pandas
