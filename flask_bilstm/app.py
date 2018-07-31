@@ -4,6 +4,9 @@ from flask import Flask,request,render_template, flash,jsonify
 #import functions to predict
 from predict import predictVolume,predictSentiment,loadModel
 
+#load the pre-trained model
+model,tok = loadModel()
+
 #simple flask app
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -82,6 +85,4 @@ def sentimentJson():
     return jsonify({'text':review_text,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
 
 if __name__ == '__main__':
-    #load the pre-trained model
-    model,tok = loadModel()
     app.run()

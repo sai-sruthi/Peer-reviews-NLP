@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import numpy as np
 
 #keras imports
 from keras.preprocessing import sequence,text
@@ -9,7 +8,6 @@ from keras.layers import Dense, Dropout, Embedding, LSTM, Bidirectional, BatchNo
 from keras.datasets import imdb
 from keras.models import load_model
 from keras.callbacks import ModelCheckpoint
-from sklearn.model_selection import train_test_split
 from keras.utils.np_utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
 np.random.seed(7)

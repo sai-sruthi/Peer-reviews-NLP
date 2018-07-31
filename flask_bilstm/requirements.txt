@@ -7,3 +7,5 @@ tensorflow
 jsonify
 numpy
 pandas
+scipy
+scikit-learn
