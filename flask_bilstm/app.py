@@ -61,7 +61,7 @@ def allJson():
     review_json = request.get_json()
     review_text = review_json['text']
     total_volume,volume_without_stopwords = predictVolume(review_text)
-    sentiment_tone,sentiment_score = predictSentiment(model,tok,review_text)
+    sentiment_tone,sentiment_confidence = predictSentiment(model,tok,review_text)
     return jsonify({'text':review_text,'total_volume':total_volume,'useful_volume':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
 
 #route to get only volume metrics via JSON request
