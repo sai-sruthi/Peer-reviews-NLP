@@ -1,11 +1,9 @@
 #flask imports
 from flask import Flask,request,render_template, flash,jsonify
 
-#import functions to predict
-from predict import predictVolume,predictSentiment,loadModel
-
-#load the pre-trained model
-model,tok = loadModel()
+#import load and predict functions:
+from initialize import loadModel
+from predict import predictVolume,predictSentiment
 
 #simple flask app
 app = Flask(__name__)
@@ -47,7 +45,7 @@ def displayVolume(review):
 
 #Display all the sentiment metrics on the screen in the web application
 def displaySentiment(review):
-    sentiment_tone,sentiment_confidence = predictSentiment(model,tok,review)
+    sentiment_tone,sentiment_confidence = predictSentiment(review)
     flash('Sentiment metrics')
     flash('Sentiment tone : {}'.format(sentiment_tone))
     flash('Sentiment confidence : {}'.format(sentiment_confidence))
@@ -61,7 +59,7 @@ def allJson():
     review_json = request.get_json()
     review_text = review_json['text']
     total_volume,volume_without_stopwords = predictVolume(review_text)
-    sentiment_tone,sentiment_confidence = predictSentiment(model,tok,review_text)
+    sentiment_tone,sentiment_confidence = predictSentiment(review_text)
     return jsonify({'text':review_text,'total_volume':total_volume,'useful_volume':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
 
 #route to get only volume metrics via JSON request
@@ -81,8 +79,9 @@ def sentimentJson():
         return 'Error : Request is not in JSON format'
     review_json = request.get_json()
     review_text = review_json['text']
-    sentiment_tone,sentiment_confidence = predictSentiment(model,tok,review_text)
+    sentiment_tone,sentiment_confidence = predictSentiment(review_text)
     return jsonify({'text':review_text,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
 
 if __name__ == '__main__':
+    loadModel()
     app.run()
