@@ -15,10 +15,12 @@ np.random.seed(7)
 maxlen = 50
 num_of_words=200000
 
-#load the pre-trained model before loading the application
+#load the keras tokenizer
 df = pd.read_csv('data/labelled_data.csv',encoding='latin1')
 keras_tokenizer = text.Tokenizer(num_of_words)
 keras_tokenizer.fit_on_texts(list(df['comment_text']))
+
+#load the pre-trained model before loading the application
 model = load_model('model/model-12.hdf5')
 test_review = np.array(['this is a test review'])
 test_review = keras_tokenizer.texts_to_sequences(test_review)
@@ -60,7 +62,7 @@ def displayVolume(review):
     flash('\n')
     flash('Volume Metrics')
     flash('Total volume of the review: {}'.format(total_volume))
-    flash('Actual useful volume of the review: {}'.format(volume_without_stopwords))
+    flash('Actual useful volume of the review without any stop words: {}'.format(volume_without_stopwords))
     flash('\n')
 
 #Display all the sentiment metrics on the screen in the web application
@@ -80,7 +82,7 @@ def allJson():
     review_text = review_json['text']
     total_volume,volume_without_stopwords = predictVolume(review_text)
     sentiment_tone,sentiment_confidence = predictSentiment(review_text)
-    return jsonify({'text':review_text,'total_volume':total_volume,'useful_volume':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
+    return jsonify({'text':review_text,'total_volume':total_volume,'volume_without_stopwords':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
 
 #route to get only volume metrics via JSON request
 @app.route('/volume', methods = ['POST'])
@@ -90,7 +92,7 @@ def volumeJson():
     review_json = request.get_json()
     review_text = review_json['text']
     total_volume,volume_without_stopwords = predictVolume(review_text)
-    return jsonify({'text':review_text,'total_volume':total_volume,'useful_volume':volume_without_stopwords})
+    return jsonify({'text':review_text,'total_volume':total_volume,'volume_without_stopwords':volume_without_stopwords})
 
 #route to get only sentiment metrics via JSON request
 @app.route('/sentiment', methods = ['POST'])

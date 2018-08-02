@@ -12,13 +12,11 @@ from nltk.corpus import stopwords
 stop_words = set(stopwords.words('english'))
 stop_words |= {'.',',','!','?'}
 
-#define constants
-#maxlen = 0
+#import the model and the keras_tokenizer
 import app
 
 #predict sentiment and confidence of the review
 def predictSentiment(review):
-    print('test',app.maxlen)
     review = np.array([review])
     review = app.keras_tokenizer.texts_to_sequences(review)
     review = sequence.pad_sequences(review, maxlen=app.maxlen)
