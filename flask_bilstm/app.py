@@ -1,9 +1,29 @@
 #flask imports
 from flask import Flask,request,render_template, flash,jsonify
 
-#import load and predict functions:
-from initialize import loadModel
+#import predict functions:
 from predict import predictVolume,predictSentiment
+
+#python and keras imports
+import pandas as pd
+import numpy as np
+from keras.models import load_model
+from keras.preprocessing import sequence,text
+np.random.seed(7)
+
+#define constants
+maxlen = 50
+num_of_words=200000
+
+#load the pre-trained model before loading the application
+df = pd.read_csv('data/labelled_data.csv',encoding='latin1')
+keras_tokenizer = text.Tokenizer(num_of_words)
+keras_tokenizer.fit_on_texts(list(df['comment_text']))
+model = load_model('model/model-12.hdf5')
+test_review = np.array(['this is a test review'])
+test_review = keras_tokenizer.texts_to_sequences(test_review)
+test_review = sequence.pad_sequences(test_review, maxlen=maxlen)
+model.predict(test_review)
 
 #simple flask app
 app = Flask(__name__)
@@ -83,5 +103,4 @@ def sentimentJson():
     return jsonify({'text':review_text,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
 
 if __name__ == '__main__':
-    loadModel()
     app.run()
