@@ -15,7 +15,7 @@ np.random.seed(7)
 df = pd.read_csv('data/labelled_data.csv',encoding='latin1')
 
 maxlen = 50
-batch_size = 64
+batch_size = 32
 
 tok = text.Tokenizer(num_words=200000)
 tok.fit_on_texts(list(df['comment_text']))
@@ -58,6 +58,6 @@ model.compile('adam', 'categorical_crossentropy', metrics=['accuracy'])
 checkpointer = ModelCheckpoint(filepath='model/model-{epoch:02d}.hdf5', verbose=1)
 model.fit(x_train, y_train,
           batch_size=batch_size,
-          epochs=12,
+          epochs=20,
           validation_data=[x_test, y_test],
           callbacks=[checkpointer])
