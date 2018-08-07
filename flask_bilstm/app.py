@@ -21,7 +21,7 @@ keras_tokenizer = text.Tokenizer(num_of_words)
 keras_tokenizer.fit_on_texts(list(df['comment_text']))
 
 #load the pre-trained model before loading the application
-model = load_model('model/model-12.hdf5')
+model = load_model('model/model-17.hdf5')
 test_review = np.array(['this is a test review'])
 test_review = keras_tokenizer.texts_to_sequences(test_review)
 test_review = sequence.pad_sequences(test_review, maxlen=maxlen)
