@@ -12,7 +12,7 @@ from keras.utils.np_utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
 np.random.seed(7)
 
-df = pd.read_csv('data/labelled_data.csv',encoding='latin1')
+df = pd.read_csv('data/sentiment_data.csv',encoding='latin1')
 
 maxlen = 50
 batch_size = 32
@@ -22,7 +22,7 @@ tok.fit_on_texts(list(df['comment_text']))
 x = tok.texts_to_sequences(df['comment_text'])
 x = sequence.pad_sequences(x, maxlen=maxlen)
 y_cat = to_categorical(df['y_true'], num_classes=3)
-x_train,x_test,y_train,y_test = train_test_split(x,y_cat,test_size=0.25)
+x_train,x_test,y_train,y_test = train_test_split(x,y_cat,test_size=0.15)
 word_index = tok.word_index
 
 #create a dictionary which stores embeddings for every word
@@ -55,9 +55,13 @@ model.add(Bidirectional(LSTM(64)))
 model.add(Dropout(0.5))
 model.add(Dense(3, activation='softmax'))
 model.compile('adam', 'categorical_crossentropy', metrics=['accuracy'])
-checkpointer = ModelCheckpoint(filepath='model/model-{epoch:02d}.hdf5', verbose=1)
+checkpointer = ModelCheckpoint(filepath='model/sentiment/model-{epoch:02d}.hdf5', verbose=1)
 model.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=20,
-          validation_data=[x_test, y_test],
+          validation_split=0.2,
           callbacks=[checkpointer])
+score, acc = model.evaluate(x_test, y_test,
+                            batch_size=batch_size)
+print('Test score:', score)
+print('Test accuracy:', acc)
