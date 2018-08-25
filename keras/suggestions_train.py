@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from keras.preprocessing import sequence,text
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Embedding, LSTM, Bidirectional, BatchNormalization, Activation
@@ -25,7 +26,7 @@ y = df['is_prompt_exists']
 encoder = LabelEncoder()
 encoder.fit(y)
 y = encoder.transform(y)
-x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.15)
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
 word_index = tok.word_index
 
 #create a dictionary which stores embeddings for every word
@@ -50,21 +51,35 @@ for word, i in word_index.items():
 
 model = Sequential()
 model.add(Embedding(len(word_index) + 1,300,weights=[embedding_matrix],input_length=maxlen,trainable=False))
-model.add(Bidirectional(LSTM(64,return_sequences=True)))
-model.add(Dropout(0.5))
-model.add(Bidirectional(LSTM(64,return_sequences=True)))
-model.add(Dropout(0.5))
-model.add(Bidirectional(LSTM(64)))
-model.add(Dropout(0.5))
+model.add(Bidirectional(LSTM(64,recurrent_dropout=0.7)))
+model.add(Dropout(0.7))
 model.add(Dense(1, activation='sigmoid'))
 model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
 checkpointer = ModelCheckpoint(filepath='model/suggestions/model-{epoch:02d}.hdf5', verbose=1)
-model.fit(x_train, y_train,
+model_history = model.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=20,
-          validation_split=0.2,
+          validation_split=0.1,
           callbacks=[checkpointer])
 score, acc = model.evaluate(x_test, y_test,
                             batch_size=batch_size)
-print('Test score:', score)
 print('Test accuracy:', acc)
+
+def plot_history(histories, key='acc'):
+  plt.figure(figsize=(16,10))
+
+  for name, history in histories:
+    val = plt.plot(history.epoch, history.history['val_'+key],
+                   '--', label=name.title()+' Validation')
+    plt.plot(history.epoch, history.history[key], color=val[0].get_color(),
+             label=name.title()+' Train')
+
+  plt.xlabel('Epochs')
+  plt.ylabel(key.replace('_',' ').title())
+  plt.legend()
+
+  plt.xlim([0,max(history.epoch)])
+  plt.show()
+
+
+plot_history([('model', model_history)])
