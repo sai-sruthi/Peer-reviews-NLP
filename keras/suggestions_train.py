@@ -26,7 +26,7 @@ y = df['is_prompt_exists']
 encoder = LabelEncoder()
 encoder.fit(y)
 y = encoder.transform(y)
-x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.1)
 word_index = tok.word_index
 
 #create a dictionary which stores embeddings for every word
@@ -51,7 +51,7 @@ for word, i in word_index.items():
 
 model = Sequential()
 model.add(Embedding(len(word_index) + 1,300,weights=[embedding_matrix],input_length=maxlen,trainable=False))
-model.add(Bidirectional(LSTM(64,recurrent_dropout=0.7)))
+model.add(LSTM(128,recurrent_dropout=0.7))
 model.add(Dropout(0.7))
 model.add(Dense(1, activation='sigmoid'))
 model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
