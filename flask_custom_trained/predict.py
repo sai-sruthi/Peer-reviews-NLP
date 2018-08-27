@@ -21,10 +21,21 @@ def predictSentiment(review):
     review = app.keras_tokenizer.texts_to_sequences(review)
     review = sequence.pad_sequences(review, maxlen=app.maxlen)
     labels = ['Neutral','Positive','Negative']
-    pred = app.model.predict(review)
+    pred = app.sentiment_model.predict(review)
     sentiment_tone = labels[np.argmax(pred[0])]
     sentiment_confidence = pred[0][np.argmax(pred[0])] * 100
     return(sentiment_tone,round(sentiment_confidence,2))
+
+#predict sentiment and confidence of the review
+def predictSuggestions(review):
+    review = np.array([review])
+    review = app.keras_tokenizer.texts_to_sequences(review)
+    review = sequence.pad_sequences(review, maxlen=app.maxlen)
+    labels = ['absent','present']
+    pred = app.suggestions_model.predict(review)
+    suggestions = labels[1 if pred[0] > 0.25 else 0]
+    suggestions_chances = pred[0][0] * 100
+    return(suggestions,round(suggestions_chances,2))
 
 #predict volume metrics of the review
 def predictVolume(review):

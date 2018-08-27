@@ -2,7 +2,7 @@
 from flask import Flask,request,render_template, flash,jsonify
 
 #import predict functions:
-from predict import predictVolume,predictSentiment
+from predict import predictVolume,predictSentiment,predictSuggestions
 
 #python and keras imports
 import pandas as pd
@@ -20,12 +20,14 @@ df = pd.read_csv('data/labelled_data.csv',encoding='latin1')
 keras_tokenizer = text.Tokenizer(num_of_words)
 keras_tokenizer.fit_on_texts(list(df['comment_text']))
 
-#load the pre-trained model before loading the application
-model = load_model('model/model-17.hdf5')
+#load the pre-trained models before loading the application
+sentiment_model = load_model('model/sentiment/model-17.hdf5')
+suggestions_model = load_model('model/suggestions/model-17.hdf5')
 test_review = np.array(['this is a test review'])
 test_review = keras_tokenizer.texts_to_sequences(test_review)
 test_review = sequence.pad_sequences(test_review, maxlen=maxlen)
-model.predict(test_review)
+sentiment_model.predict(test_review)
+suggestions_model.predict(test_review)
 
 #simple flask app
 app = Flask(__name__)
@@ -54,6 +56,7 @@ def renderPage():
 def displayMetrics(review):
     displayVolume(review)
     displaySentiment(review)
+    displaySuggestions(review)
 
 #Display all the volume metrics on the screen in the web application
 def displayVolume(review):
@@ -71,6 +74,13 @@ def displaySentiment(review):
     flash('Sentiment metrics')
     flash('Sentiment tone : {}'.format(sentiment_tone))
     flash('Sentiment confidence : {}'.format(sentiment_confidence))
+    flash('\n')
+
+#Display all the suggestion metrics on the screen in the web application
+def displaySuggestions(review):
+    suggestions,suggestions_chances = predictSuggestions(review)
+    flash('Suggestion metrics')
+    flash('There is a %.2f%% chance that this review contains suggestions' %(suggestions_chances))
     flash('\n')
 
 #route to get all metrics via JSON request
