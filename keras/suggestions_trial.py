@@ -14,19 +14,18 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
 np.random.seed(7)
 
-df = pd.read_csv('data/suggestions_data.csv',encoding='latin1')
-df2 = pd.read_csv('data/trial_data.csv',encoding='latin1')
-df3 = pd.read_csv('data/tweets_data.csv',encoding='latin1')
+df = pd.read_csv('data/trial_data.csv',encoding='latin1')
 
 
-maxlen = 25
+
+maxlen = 50
 batch_size = 128
 
 tok = text.Tokenizer(num_words=200000)
-tok.fit_on_texts(list(df['comments']))
-x = tok.texts_to_sequences(df['comments'])
+tok.fit_on_texts(list(df['sentence']))
+x = tok.texts_to_sequences(df['sentence'])
 x = sequence.pad_sequences(x, maxlen=maxlen)
-y = df['is_prompt_exists']
+y = df['label']
 encoder = LabelEncoder()
 encoder.fit(y)
 y = encoder.transform(y)
@@ -65,7 +64,7 @@ model1.add(Dense(1, activation='sigmoid'))
 model1.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
 model1_history = model1.fit(x_train, y_train,
           batch_size=batch_size,
-          epochs=5,
+          epochs=10,
           validation_split=0.1)
 score1, acc1 = model1.evaluate(x_test, y_test,
                             batch_size=batch_size)
@@ -73,67 +72,28 @@ print('Test accuracy for model 1:', acc1)
 y_pred1 = model1.predict(x_test)
 y_pred1 = (y_pred1 > 0.5)
 print(classification_report(y_test, y_pred1))
-print(confusion_matrix(y_test, y_pred1))
+#print(confusion_matrix(y_test, y_pred1))
 
-"""model3 = Sequential()
-#model3.add(Embedding(len(word_index) + 1,300,weights=[embedding_matrix],input_length=maxlen,trainable=False))
-model3.add(Embedding(len(word_index) + 1,100,input_length=maxlen))
-model3.add(Dropout(0.3))
-model3.add(Conv1D(350,3,padding='valid',activation='relu',strides=1))
-model3.add(GlobalMaxPooling1D())
-model3.add(Flatten())
-model3.add(Dense(350, activation = 'relu'))
-model3.add(Dropout(0.3))
-model3.add(Dense(1, activation='sigmoid'))
-model3.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
-model3_history = model3.fit(x_train, y_train,
+"""model2 = Sequential()
+#model2.add(Embedding(len(word_index) + 1,300,weights=[embedding_matrix],input_length=maxlen,trainable=False))
+model2.add(Embedding(len(word_index) + 1,100,input_length=maxlen))
+model2.add(Dropout(0.2))
+model2.add(Conv1D(250,3,padding='valid',activation='relu',strides=1))
+model2.add(GlobalMaxPooling1D())
+model2.add(Flatten())
+model2.add(Dense(250, activation = 'relu'))
+model2.add(Dropout(0.2))
+model2.add(Dense(1, activation='sigmoid'))
+model2.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
+model2_history = model2.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=5,
           validation_split=0.1)
-score3, acc3 = model3.evaluate(x_test, y_test,
-                            batch_size=batch_size)
-print('Test accuracy for model 3:', acc3)
-y_pred3 = model1.predict(x_test)
-y_pred3 = (y_pred3 > 0.5)
-print(classification_report(y_test, y_pred3))"""
-
-tok2 = text.Tokenizer(num_words=200000)
-tok2.fit_on_texts(list(df2['sentence']))
-x2 = tok2.texts_to_sequences(df2['sentence'])
-x2 = sequence.pad_sequences(x2, maxlen=maxlen)
-y2 = df2['label']
-encoder2 = LabelEncoder()
-encoder2.fit(y2)
-y2 = encoder2.transform(y2)
-
-score2, acc2 = model1.evaluate(x2, y2,
+score2, acc2 = model2.evaluate(x_test, y_test,
                             batch_size=batch_size)
 print('Test accuracy for model 2:', acc2)
-y_pred2 = model1.predict(x2)
-y_pred2 = (y_pred2 > 0.5)
-print(classification_report(y2, y_pred2))
-#print(confusion_matrix(y2, y_pred2))
 
-tok3 = text.Tokenizer(num_words=200000)
-tok3.fit_on_texts(list(df3['text']))
-x3 = tok3.texts_to_sequences(df3['text'])
-x3 = sequence.pad_sequences(x3, maxlen=maxlen)
-y3 = df3['label']
-encoder3 = LabelEncoder()
-encoder3.fit(y3)
-y3 = encoder3.transform(y3)
-
-score3, acc3 = model1.evaluate(x3, y3,
-                            batch_size=batch_size)
-print('Test accuracy for model 3:', acc3)
-y_pred3 = model1.predict(x3)
-y_pred3 = (y_pred3 > 0.5)
-print(classification_report(y3, y_pred3))
-
-
-
-
-"""def plot_history(histories, key='acc'):
+def plot_history(histories, key='acc'):
   plt.figure(figsize=(16,10))
 
   for name, history in histories:

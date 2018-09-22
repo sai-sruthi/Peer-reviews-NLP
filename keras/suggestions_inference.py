@@ -19,8 +19,8 @@ tok = text.Tokenizer(num_words=200000)
 tok.fit_on_texts(list(df['comments']))
 
 #load model and make predictions
-model = load_model('model/suggestions/model-11.hdf5')
-sentences = np.array(["Yes. The team contribute a lot of test code and no obvious missing"])
+model = load_model('model/suggestions/model-17.hdf5')
+sentences = np.array(["The wiki doesn't provide a word about the changes.I suggest that you should talk about what you have changed in your design, and give corresponding explanations."])
 test_sentence = tok.texts_to_sequences(sentences)
 test_sentence = sequence.pad_sequences(test_sentence, maxlen=maxlen)
 labels = ['absent','present']
