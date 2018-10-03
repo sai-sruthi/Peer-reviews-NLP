@@ -53,61 +53,67 @@ for word, i in word_index.items():
         embedding_matrix[i] = embedding_vector
 
 model1 = Sequential()
-#model1.add(Embedding(len(word_index) + 1,300,weights=[embedding_matrix],input_length=maxlen,trainable=True))
-model1.add(Embedding(len(word_index) + 1,100,input_length=maxlen))
-model1.add(Dropout(0.5))
-model1.add(LSTM(100,recurrent_dropout=0.5))
-model1.add(Dropout(0.5))
-#model1.add(Dense(128, activation='relu'))
-#model1.add(Dropout(0.5))
+model1.add(Embedding(len(word_index) + 1,300,weights=[embedding_matrix],input_length=maxlen,trainable=True))
+model1.add(Dropout(0.6))
+model1.add(Bidirectional(LSTM(150,recurrent_dropout=0.6)))
+model1.add(Dropout(0.6))
 model1.add(Dense(1, activation='sigmoid'))
 model1.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
-model1_history = model1.fit(x_train, y_train,
-          batch_size=batch_size,
-          epochs=10,
-          validation_split=0.1)
+model1_history = model1.fit(x_train, y_train, batch_size=batch_size, epochs=9,
+                            validation_split=0.1)
 score1, acc1 = model1.evaluate(x_test, y_test,
-                            batch_size=batch_size)
-print('Test accuracy for model 1:', acc1)
+                               batch_size=batch_size)
+print('Test accuracy for BiLSTM+Glove Model is:', acc1)
 y_pred1 = model1.predict(x_test)
 y_pred1 = (y_pred1 > 0.5)
 print(classification_report(y_test, y_pred1))
-#print(confusion_matrix(y_test, y_pred1))
 
-"""model2 = Sequential()
-#model2.add(Embedding(len(word_index) + 1,300,weights=[embedding_matrix],input_length=maxlen,trainable=False))
+model2 = Sequential()
 model2.add(Embedding(len(word_index) + 1,100,input_length=maxlen))
-model2.add(Dropout(0.2))
-model2.add(Conv1D(250,3,padding='valid',activation='relu',strides=1))
+model2.add(Dropout(0.5))
+model2.add(Conv1D(100,3,padding='valid',activation='relu',strides=1))
 model2.add(GlobalMaxPooling1D())
-model2.add(Flatten())
-model2.add(Dense(250, activation = 'relu'))
-model2.add(Dropout(0.2))
+model2.add(Dense(100, activation='relu'))
+model2.add(Dropout(0.5))
 model2.add(Dense(1, activation='sigmoid'))
 model2.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
-model2_history = model2.fit(x_train, y_train,
-          batch_size=batch_size,
-          epochs=5,
-          validation_split=0.1)
-score2, acc2 = model2.evaluate(x_test, y_test,
-                            batch_size=batch_size)
-print('Test accuracy for model 2:', acc2)
+model2_history = model2.fit(x_train, y_train, batch_size=batch_size, epochs=5,
+                            validation_split=0.1)
+score2, acc2 = model2.evaluate(x_test, y_test, batch_size=batch_size)
+print('Test accuracy for CNN+Dense Model is:', acc2)
+y_pred2 = model2.predict(x_test)
+y_pred2 = (y_pred2 > 0.5)
+print(classification_report(y_test, y_pred2))
 
-def plot_history(histories, key='acc'):
-  plt.figure(figsize=(16,10))
+model3 = Sequential()
+model3.add(Embedding(len(word_index) + 1, 100, input_length=maxlen))
+model3.add(Dropout(0.5))
+model3.add(Conv1D(50, 5, padding='valid', activation='relu', strides=1))
+model3.add(MaxPooling1D(pool_size=4))
+model3.add(LSTM(100, recurrent_dropout=0.6))
+model3.add(Dropout(0.6))
+model3.add(Dense(1, activation='sigmoid'))
+model3.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
+model3_history = model3.fit(x_train, y_train, batch_size=batch_size, epochs=4,
+                            validation_split=0.1)
+score3, acc3 = model3.evaluate(x_test, y_test, batch_size=batch_size)
+print('Test accuracy for CNN+LSTM Model is:', acc3)
+y_pred3 = model3.predict(x_test)
+y_pred3 = (y_pred3 > 0.5)
+print(classification_report(y_test, y_pred3))
 
-  for name, history in histories:
-    val = plt.plot(history.epoch, history.history['val_'+key],
-                   '--', label=name.title()+' Validation')
-    plt.plot(history.epoch, history.history[key], color=val[0].get_color(),
-             label=name.title()+' Train')
-
-  plt.xlabel('Epochs')
-  plt.ylabel(key.replace('_',' ').title())
-  plt.legend()
-
-  plt.xlim([0,max(history.epoch)])
-  plt.show()
-
-
-plot_history([('model1', model1_history),('model2', model2_history)])"""
+model4 = Sequential()
+model4.add(Embedding(len(word_index) + 1, 100, input_length=maxlen))
+model4.add(Dropout(0.6))
+model4.add(LSTM(100, recurrent_dropout=0.6))
+model4.add(Dropout(0.6))
+model4.add(Dense(1, activation='sigmoid'))
+model4.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
+model4_history = model4.fit(x_train, y_train, batch_size=batch_size, epochs=7,
+                            validation_split=0.1)
+score4, acc4 = model4.evaluate(x_test, y_test,
+                               batch_size=batch_size)
+print('Test accuracy for LSTM Model is:', acc4)
+y_pred4 = model4.predict(x_test)
+y_pred4 = (y_pred4 > 0.5)
+print(classification_report(y_test, y_pred4))
