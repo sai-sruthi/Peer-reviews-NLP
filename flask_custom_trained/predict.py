@@ -2,6 +2,13 @@
 import numpy as np
 from keras.preprocessing import sequence,text
 np.random.seed(7)
+import os
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
+
+#Google cloud imports
+from google.cloud import language
+from google.cloud.language import enums
+from google.cloud.language import types
 
 #Import nltk libraries for volume analysis
 from nltk.tokenize import TreebankWordTokenizer
@@ -15,25 +22,30 @@ stop_words |= {'.',',','!','?'}
 #import the model and the keras_tokenizer
 import app
 
-#predict sentiment and confidence of the review
+#predict sentiment tone and score of the review
 def predictSentiment(review):
-    review = np.array([review])
-    review = app.keras_tokenizer.texts_to_sequences(review)
-    review = sequence.pad_sequences(review, maxlen=app.maxlen)
-    labels = ['Neutral','Positive','Negative']
-    pred = app.sentiment_model.predict(review)
-    sentiment_tone = labels[np.argmax(pred[0])]
-    sentiment_confidence = pred[0][np.argmax(pred[0])] * 100
-    return(sentiment_tone,round(sentiment_confidence,2))
+    client = language.LanguageServiceClient()
+    document = types.Document(content=review, type=enums.Document.Type.PLAIN_TEXT)
+    sentiment = client.analyze_sentiment(document=document).document_sentiment
+    if sentiment.score > 0.25:
+        sentiment_tone = "Positive"
+    elif sentiment.score < -0.25:
+        sentiment_tone = "Negative"
+    else:
+        if sentiment.magnitude < 0.6:
+            sentiment_tone = "Neutral"
+        else:
+            sentiment_tone = "Mixed"
+    return(sentiment_tone,round(sentiment.score,3))
 
-#predict sentiment and confidence of the review
+#predict presence and chances of suggestions in the review
 def predictSuggestions(review):
     review = np.array([review])
     review = app.keras_tokenizer.texts_to_sequences(review)
     review = sequence.pad_sequences(review, maxlen=app.maxlen)
     labels = ['absent','present']
     pred = app.suggestions_model.predict(review)
-    suggestions = labels[1 if pred[0] > 0.25 else 0]
+    suggestions = labels[1 if pred[0] > 0.5 else 0]
     suggestions_chances = pred[0][0] * 100
     return(suggestions,round(suggestions_chances,2))
 

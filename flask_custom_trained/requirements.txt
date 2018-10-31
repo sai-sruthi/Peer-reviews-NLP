@@ -9,3 +9,5 @@ numpy
 pandas
 scipy
 scikit-learn
+google-cloud
+google-cloud-language

@@ -16,18 +16,18 @@ maxlen = 50
 num_of_words=200000
 
 #load the keras tokenizer
-df = pd.read_csv('data/labelled_data.csv',encoding='latin1')
+df = pd.read_csv('data/suggestions_data_cleaned.csv',encoding='latin1')
 keras_tokenizer = text.Tokenizer(num_of_words)
-keras_tokenizer.fit_on_texts(list(df['comment_text']))
+keras_tokenizer.fit_on_texts(list(df['comments']))
 
 #load the pre-trained models before loading the application
-sentiment_model = load_model('model/sentiment/model-17.hdf5')
-suggestions_model = load_model('model/suggestions/model-17.hdf5')
-test_review = np.array(['this is a test review'])
+#sentiment_model = load_model('model/sentiment/model-17.hdf5')
+suggestions_model = load_model('model/suggestions/model-09.hdf5')
+"""test_review = np.array(['this is a test review'])
 test_review = keras_tokenizer.texts_to_sequences(test_review)
 test_review = sequence.pad_sequences(test_review, maxlen=maxlen)
-sentiment_model.predict(test_review)
-suggestions_model.predict(test_review)
+#sentiment_model.predict(test_review)
+suggestions_model.predict(test_review)"""
 
 #simple flask app
 app = Flask(__name__)
@@ -70,17 +70,17 @@ def displayVolume(review):
 
 #Display all the sentiment metrics on the screen in the web application
 def displaySentiment(review):
-    sentiment_tone,sentiment_confidence = predictSentiment(review)
+    sentiment_tone,sentiment_score = predictSentiment(review)
     flash('Sentiment metrics')
     flash('Sentiment tone : {}'.format(sentiment_tone))
-    flash('Sentiment confidence : {}'.format(sentiment_confidence))
+    flash('Sentiment confidence : {}'.format(sentiment_score))
     flash('\n')
 
 #Display all the suggestion metrics on the screen in the web application
 def displaySuggestions(review):
     suggestions,suggestions_chances = predictSuggestions(review)
     flash('Suggestion metrics')
-    flash('There is a %.2f%% chance that this review contains suggestions' %(suggestions_chances))
+    flash('In this review, suggestions are {}'.format(suggestions))
     flash('\n')
 
 #route to get all metrics via JSON request
@@ -91,8 +91,9 @@ def allJson():
     review_json = request.get_json()
     review_text = review_json['text']
     total_volume,volume_without_stopwords = predictVolume(review_text)
-    sentiment_tone,sentiment_confidence = predictSentiment(review_text)
-    return jsonify({'text':review_text,'total_volume':total_volume,'volume_without_stopwords':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
+    sentiment_tone,sentiment_score = predictSentiment(review_text)
+    suggestions,suggestions_chances = predictSuggestions(review_text)
+    return jsonify({'text':review_text,'total_volume':total_volume,'volume_without_stopwords':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_score':sentiment_score, 'suggestions':suggestions,'suggestions_chances':suggestions_chances})
 
 #route to get only volume metrics via JSON request
 @app.route('/volume', methods = ['POST'])
@@ -111,8 +112,18 @@ def sentimentJson():
         return 'Error : Request is not in JSON format'
     review_json = request.get_json()
     review_text = review_json['text']
-    sentiment_tone,sentiment_confidence = predictSentiment(review_text)
-    return jsonify({'text':review_text,'sentiment_tone':sentiment_tone,'sentiment_confidence':sentiment_confidence})
+    sentiment_tone,sentiment_score = predictSentiment(review_text)
+    return jsonify({'text':review_text,'sentiment_tone':sentiment_tone,'sentiment_score':sentiment_score})
+
+#route to get only sentiment metrics via JSON request
+@app.route('/suggestions', methods = ['POST'])
+def suggestionsJson():
+    if not request.is_json:
+        return 'Error : Request is not in JSON format'
+    review_json = request.get_json()
+    review_text = review_json['text']
+    suggestions,suggestions_chances = predictSuggestions(review_text)
+    return jsonify({'text':review_text,'suggestions':suggestions,'suggestions_chances':suggestions_chances})
 
 if __name__ == '__main__':
     app.run()
