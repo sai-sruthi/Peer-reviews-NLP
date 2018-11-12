@@ -2,7 +2,7 @@
 from flask import Flask,request,render_template, flash,jsonify
 
 #import predict functions:
-from predict import predictVolume,predictSentiment,predictSuggestions
+from predict import predictVolume,predictSentiment,predictSuggestions,predictEmotion
 
 #python and keras imports
 import pandas as pd
@@ -57,6 +57,7 @@ def displayMetrics(review):
     displayVolume(review)
     displaySentiment(review)
     displaySuggestions(review)
+    displayEmotion(review)
 
 #Display all the volume metrics on the screen in the web application
 def displayVolume(review):
@@ -73,7 +74,7 @@ def displaySentiment(review):
     sentiment_tone,sentiment_score = predictSentiment(review)
     flash('Sentiment metrics')
     flash('Sentiment tone : {}'.format(sentiment_tone))
-    flash('Sentiment confidence : {}'.format(sentiment_score))
+    flash('Sentiment score : {}'.format(sentiment_score))
     flash('\n')
 
 #Display all the suggestion metrics on the screen in the web application
@@ -82,6 +83,13 @@ def displaySuggestions(review):
     flash('Suggestion metrics')
     flash('In this review, suggestions are {}'.format(suggestions))
     flash('\n')
+
+#Display presence of praise and criticism
+def displayEmotion(review):
+    praise,criticism = predictEmotion(review)
+    flash('Praise and criticism metrics')
+    flash('Praise : {}'.format(praise))
+    flash('Criticism : {}'.format(criticism))
 
 #route to get all metrics via JSON request
 @app.route('/all', methods = ['POST'])
@@ -93,7 +101,8 @@ def allJson():
     total_volume,volume_without_stopwords = predictVolume(review_text)
     sentiment_tone,sentiment_score = predictSentiment(review_text)
     suggestions,suggestions_chances = predictSuggestions(review_text)
-    return jsonify({'text':review_text,'total_volume':total_volume,'volume_without_stopwords':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_score':sentiment_score, 'suggestions':suggestions,'suggestions_chances':suggestions_chances})
+    praise,criticism = predictEmotion(review_text)
+    return jsonify({'text':review_text,'total_volume':total_volume,'volume_without_stopwords':volume_without_stopwords,'sentiment_tone':sentiment_tone,'sentiment_score':sentiment_score, 'suggestions':suggestions,'suggestions_chances':suggestions_chances, 'Praise':praise,'Criticism':criticism})
 
 #route to get only volume metrics via JSON request
 @app.route('/volume', methods = ['POST'])
@@ -115,7 +124,17 @@ def sentimentJson():
     sentiment_tone,sentiment_score = predictSentiment(review_text)
     return jsonify({'text':review_text,'sentiment_tone':sentiment_tone,'sentiment_score':sentiment_score})
 
-#route to get only sentiment metrics via JSON request
+#route to get only emotion metrics via JSON request
+@app.route('/emotions', methods = ['POST'])
+def emotionsJson():
+    if not request.is_json:
+        return 'Error : Request is not in JSON format'
+    review_json = request.get_json()
+    review_text = review_json['text']
+    praise,criticism = predictEmotion(review_text)
+    return jsonify({'text':review_text,'Praise':praise,'Criticism':criticism})
+
+#route to get only suggestion metrics via JSON request
 @app.route('/suggestions', methods = ['POST'])
 def suggestionsJson():
     if not request.is_json:

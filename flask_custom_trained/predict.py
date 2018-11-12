@@ -58,3 +58,25 @@ def predictVolume(review):
     non_stop_words = [word for word in tokens if word not in stop_words]
     volume_without_stopwords = len(non_stop_words)
     return (total_volume,volume_without_stopwords)
+
+#predict presence of praise and or criticism in the review
+def predictEmotion(review):
+    client = language.LanguageServiceClient()
+    document = types.Document(content=review, type=enums.Document.Type.PLAIN_TEXT)
+    sentiment = client.analyze_sentiment(document=document).document_sentiment
+    praise = criticism = "None"
+    if sentiment.magnitude >= 0.6 and sentiment.magnitude < 1.5:
+        if sentiment.score > 0.25:
+            praise = "Low"
+        elif sentiment.score < -0.25:
+            criticism = "Low"
+        else:
+            praise = criticism = "Low"
+    elif sentiment.magnitude >= 1.5:
+        if sentiment.score > 0.25:
+            praise = "High"
+        elif sentiment.score < -0.25:
+            criticism = "High"
+        else:
+            praise = criticism = "High"
+    return (praise, criticism)
