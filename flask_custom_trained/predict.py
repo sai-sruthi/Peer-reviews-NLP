@@ -1,28 +1,34 @@
-#python and keras imports
+# python and keras imports
 import numpy as np
-from keras.preprocessing import sequence,text
+from keras.preprocessing import sequence, text
+from suggestions_and_problem_preprocessing import load_items, predict_class
+
 np.random.seed(7)
 import os
+
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
 
-#Google cloud imports
+# Google cloud imports
 from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 
-#Import nltk libraries for volume analysis
+# Import nltk libraries for volume analysis
 from nltk.tokenize import TreebankWordTokenizer
+
 treebank_tokenizer = TreebankWordTokenizer()
 from nltk.corpus import stopwords
 
-#set rules for stopwords ignored in volume analysis
+# set rules for stopwords ignored in volume analysis
 stop_words = set(stopwords.words('english'))
-stop_words |= {'.',',','!','?'}
+stop_words |= {'.', ',', '!', '?'}
 
-#import the model and the keras_tokenizer
-import app
+# path to locate the saved Machine Learning models
+model_path = os.path.join(app.root_path, 'model')
+print(model_path)
 
-#predict sentiment tone and score of the review
+
+# predict sentiment tone and score of the review
 def predictSentiment(review):
     client = language.LanguageServiceClient()
     document = types.Document(content=review, type=enums.Document.Type.PLAIN_TEXT)
@@ -36,36 +42,41 @@ def predictSentiment(review):
             sentiment_tone = "Neutral"
         else:
             sentiment_tone = "Mixed"
-    return(sentiment_tone,round(sentiment.score,3))
+    return (sentiment_tone, round(sentiment.score, 3))
 
-#predict presence and chances of suggestions in the review
+
+# predict presence and chances of suggestions in the review
 def predictSuggestions(review):
-    review = np.array([review])
-    review = app.keras_tokenizer.texts_to_sequences(review)
-    review = sequence.pad_sequences(review, maxlen=app.maxlen)
-    labels = ['absent','present']
-    pred = app.suggestions_model.predict(review)
-    suggestions = labels[1 if pred[0] > 0.5 else 0]
-    suggestions_chances = pred[0][0] * 100
-    return(suggestions,round(suggestions_chances,2))
+    filepath_model = "/Users/tunveyyy/Documents/independentStudy/Peer-reviews-NLP/flask_custom_trained/model/suggestions_cnn_model.h5"
+    filepath_tokenizer = "/Users/tunveyyy/Documents/independentStudy/Peer-reviews-NLP/flask_custom_trained/model/suggestions_tokenizer"
+    model, tokenizer = load_items(filepath_model, filepath_tokenizer)
+    predicted_comment = predict_class(review, model, tokenizer, 200)
 
-#predict volume metrics of the review
+    if predicted_comment == 1:
+        suggestion = "Present"
+    else:
+        suggestion = "Absent"
+    return suggestion
+
+
+# predict volume metrics of the review
 def predictVolume(review):
-    #tokenize the review using NLTK tokenizer
+    # tokenize the review using NLTK tokenizer
     tokens = treebank_tokenizer.tokenize(review)
     total_volume = len(tokens)
-    #remove all the stopwords
+    # remove all the stopwords
     non_stop_words = [word for word in tokens if word not in stop_words]
     volume_without_stopwords = len(non_stop_words)
-    return (total_volume,volume_without_stopwords)
+    return (total_volume, volume_without_stopwords)
 
-#predict presence of praise and or criticism in the review
+
+# predict presence of praise and or criticism in the review
 def predictEmotion(review):
     client = language.LanguageServiceClient()
     document = types.Document(content=review, type=enums.Document.Type.PLAIN_TEXT)
     sentiment = client.analyze_sentiment(document=document).document_sentiment
     praise = criticism = "None"
-    if sentiment.magnitude >= 0.6 and sentiment.magnitude < 1.5:
+    if 0.6 <= sentiment.magnitude < 1.5:
         if sentiment.score > 0.25:
             praise = "Low"
         elif sentiment.score < -0.25:
@@ -79,4 +90,19 @@ def predictEmotion(review):
             criticism = "High"
         else:
             praise = criticism = "High"
-    return (praise, criticism)
+    return praise, criticism
+
+
+# predict presence of problem in the review
+
+def predictProblem(review):
+    filepath_model = "/Users/tunveyyy/Documents/independentStudy/Peer-reviews-NLP/flask_custom_trained/model/problems_cnn_model.h5"
+    filepath_tokenizer = "/Users/tunveyyy/Documents/independentStudy/Peer-reviews-NLP/flask_custom_trained/model/problems_tokenizer"
+    model, tokenizer = load_items(filepath_model, filepath_tokenizer)
+    predicted_comment = predict_class(review, model, tokenizer, 400)
+    problem = "None"
+    if predicted_comment == 1:
+        problem = "Present"
+    else:
+        problem = "Absent"
+    return problem
