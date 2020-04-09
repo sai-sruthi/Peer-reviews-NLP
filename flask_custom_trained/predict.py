@@ -3,9 +3,7 @@ import numpy as np
 from keras.preprocessing import sequence, text
 from suggestions_and_problem_preprocessing import load_items, predict_class
 
-np.random.seed(7)
 import os
-
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
 
 # Google cloud imports
@@ -23,9 +21,7 @@ from nltk.corpus import stopwords
 stop_words = set(stopwords.words('english'))
 stop_words |= {'.', ',', '!', '?'}
 
-# path to locate the saved Machine Learning models
-model_path = os.path.join(app.root_path, 'model')
-print(model_path)
+
 
 
 # predict sentiment tone and score of the review
@@ -47,9 +43,10 @@ def predictSentiment(review):
 
 # predict presence and chances of suggestions in the review
 def predictSuggestions(review):
-    filepath_model = "/Users/tunveyyy/Documents/independentStudy/Peer-reviews-NLP/flask_custom_trained/model/suggestions_cnn_model.h5"
-    filepath_tokenizer = "/Users/tunveyyy/Documents/independentStudy/Peer-reviews-NLP/flask_custom_trained/model/suggestions_tokenizer"
-    model, tokenizer = load_items(filepath_model, filepath_tokenizer)
+    model = os.path.abspath('.')    # path to locate the saved Machine Learning models
+    suggestion_model = model + "/model/suggestions_cnn_model.h5"
+    suggestions_tokenizer = model + "/model/suggestions_tokenizer"
+    model, tokenizer = load_items(suggestion_model,suggestions_tokenizer)
     predicted_comment = predict_class(review, model, tokenizer, 200)
 
     if predicted_comment == 1:
@@ -96,9 +93,11 @@ def predictEmotion(review):
 # predict presence of problem in the review
 
 def predictProblem(review):
-    filepath_model = "/Users/tunveyyy/Documents/independentStudy/Peer-reviews-NLP/flask_custom_trained/model/problems_cnn_model.h5"
-    filepath_tokenizer = "/Users/tunveyyy/Documents/independentStudy/Peer-reviews-NLP/flask_custom_trained/model/problems_tokenizer"
-    model, tokenizer = load_items(filepath_model, filepath_tokenizer)
+
+    model = os.path.abspath('.')  # path to locate the saved Machine Learning models
+    problems_model = model + "/model/problems_cnn_model.h5"
+    problems_tokenizer = model + "/model/problems_tokenizer"
+    model, tokenizer = load_items(problems_model,problems_tokenizer)
     predicted_comment = predict_class(review, model, tokenizer, 400)
     problem = "None"
     if predicted_comment == 1:
@@ -106,3 +105,4 @@ def predictProblem(review):
     else:
         problem = "Absent"
     return problem
+
