@@ -2,13 +2,14 @@
 from flask import Flask, request, render_template, flash, jsonify
 
 # import predict functions:
-from predict import predictVolume, predictSentiment, predictSuggestions, predictEmotion,predictProblem
-
+from predict import predictVolume, predictSentiment, predictSuggestions, predictEmotion, predictProblem
+import os
 
 # simple flask app
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '10cr441f27d441f28567d441f2b2018j'
+
 
 
 # app routes
@@ -22,6 +23,7 @@ def renderPage():
         # Check which button was pressed
         if request.form['submit'] == 'Analyze':
             review = request.form.get("text")
+            print(review)
             displayMetrics(review)
         elif request.form['submit'] == 'Clear':
             review = ''
@@ -62,7 +64,7 @@ def displaySentiment(review):
 
 # Display all the suggestion metrics on the screen in the web application
 def displaySuggestions(review):
-    suggestions, suggestions_chances = predictSuggestions(review)
+    suggestions = predictSuggestions(review)
     flash('Suggestion metrics')
     flash('In this review, suggestions are {}'.format(suggestions))
     flash('\n')
@@ -74,11 +76,12 @@ def displayEmotion(review):
     flash('Praise and criticism metrics')
     flash('Praise : {}'.format(praise))
     flash('Criticism : {}'.format(criticism))
+    flash('\n')
 
 def displayProblem(review):
     problem = predictProblem(review)
     flash('Problem detection metrics')
-    flash('Problem:{}'.format(problem))
+    flash('In this review, problems are {}'.format(problem))
 
 
 # route to get all metrics via JSON request
@@ -87,22 +90,27 @@ def allJson():
     if not request.is_json:
         return 'Error : Request is not in JSON format'
     review_json = request.get_json()
-    review_text = review_json['text']
-    total_volume, volume_without_stopwords = predictVolume(review_text)
-    sentiment_tone, sentiment_score = predictSentiment(review_text)
-    suggestions = predictSuggestions(review_text)
-    praise, criticism = predictEmotion(review_text)
-    problem = predictProblem(review_text)
-    return jsonify({
-        'text': review_text, 
-        'Total_volume': total_volume, 
-        'Volume_without_stopwords': volume_without_stopwords,
-        'Sentiment_tone': sentiment_tone, 
-        'Sentiment_score': sentiment_score, 
-        'Suggestions': suggestions,
-        'Praise': praise, 
-        'Criticism': criticism,
-        'Problem': problem })
+    review_text = review_json['reviews']
+    output = []
+    for reviews in review_text:
+        total_volume, volume_without_stopwords = predictVolume(reviews['text'])
+        sentiment_tone, sentiment_score = predictSentiment(reviews['text'])
+        suggestions = predictSuggestions(reviews['text'])
+        praise, criticism = predictEmotion(reviews['text'])
+        problem = predictProblem(reviews['text'])
+        result = {
+            'text': reviews['text'], 
+            'Total_volume': total_volume, 
+            'Volume_without_stopwords': volume_without_stopwords,
+            'Sentiment_tone': sentiment_tone, 
+            'Sentiment_score': sentiment_score, 
+            'Suggestions': suggestions,
+            'Praise': praise, 
+            'Criticism': criticism,
+            'Problem': problem }
+        output.append(result)   
+    return jsonify ({'reviews':output})
+
 
 
 # route to get only volume metrics via JSON request
@@ -111,10 +119,14 @@ def volumeJson():
     if not request.is_json:
         return 'Error : Request is not in JSON format'
     review_json = request.get_json()
-    review_text = review_json['text']
-    total_volume, volume_without_stopwords = predictVolume(review_text)
-    return jsonify(
-        {'text': review_text, 'total_volume': total_volume, 'volume_without_stopwords': volume_without_stopwords})
+    review_text = review_json['reviews']
+    output = []
+    for reviews in review_text:
+        total_volume, volume_without_stopwords = predictVolume(reviews['text'])
+        result = {'text': reviews['text'], 'total_volume': total_volume, 'volume_without_stopwords': volume_without_stopwords}
+        output.append(result)
+    return jsonify ({'reviews':output})
+    
 
 
 # route to get only sentiment metrics via JSON request
@@ -123,9 +135,14 @@ def sentimentJson():
     if not request.is_json:
         return 'Error : Request is not in JSON format'
     review_json = request.get_json()
-    review_text = review_json['text']
-    sentiment_tone, sentiment_score = predictSentiment(review_text)
-    return jsonify({'text': review_text, 'sentiment_tone': sentiment_tone, 'sentiment_score': sentiment_score})
+    review_text = review_json['reviews']
+    output = []
+    for reviews in review_text:
+        sentiment_tone, sentiment_score = predictSentiment(reviews['text'])
+        result = {'text': reviews['text'], 'sentiment_tone': sentiment_tone, 'sentiment_score': sentiment_score}
+        output.append(result)
+    return jsonify ({'reviews':output})
+    
 
 
 # route to get only emotion metrics via JSON request
@@ -134,9 +151,13 @@ def emotionsJson():
     if not request.is_json:
         return 'Error : Request is not in JSON format'
     review_json = request.get_json()
-    review_text = review_json['text']
-    praise, criticism = predictEmotion(review_text)
-    return jsonify({'text': review_text, 'Praise': praise, 'Criticism': criticism})
+    review_text = review_json['reviews']
+    output = []
+    for reviews in review_text:
+        praise, criticism = predictEmotion(reviews['text'])
+        result = {'text': reviews['text'], 'Praise': praise, 'Criticism': criticism}
+        output.append(result)
+    return jsonify ({'reviews':output})
 
 
 # route to get only suggestion metrics via JSON request
@@ -145,19 +166,27 @@ def suggestionsJson():
     if not request.is_json:
         return 'Error : Request is not in JSON format'
     review_json = request.get_json()
-    review_text = review_json['text']
-    suggestions = predictSuggestions(review_text)
-    print(suggestions)
-    return jsonify({'text': review_text, 'suggestions': suggestions})
+    review_text = review_json['reviews']
+    output = []
+    for reviews in review_text:
+        suggestions = predictSuggestions(reviews['text'])
+        result = { "text": reviews['text'],"suggestions" : suggestions}
+        output.append(result)
+    return jsonify({'reviews':output})
 
 @app.route('/problem', methods=['POST'])
 def problemJson():
     if not request.is_json:
         return 'Error : Request is not in JSON format'
     review_json = request.get_json()
-    review_text = review_json['text']
-    problem = predictProblem(review_text)
-    return jsonify({'text': review_text, 'problem': problem})
+    review_text = review_json['reviews']
+    output = []
+    for reviews in review_text:
+        problem = predictProblem(reviews['text'])
+        result = { 'text': reviews['text'], "problems": problem}
+        output.append(result)
+    return jsonify({'reviews':output})
+
 
 if __name__ == '__main__':
     app.run()
