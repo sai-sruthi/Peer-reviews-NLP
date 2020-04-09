@@ -28,23 +28,26 @@ https://peerlogic.csc.ncsu.edu/problem for problem detection only
 	"reviews": 
     [
         {
-        "text" : "The project can be improved"
+            "id" : 1,
+            "text" : "This is an excellent project. Keep up the great work"
         },
         {
-        "text" : "This is an excellent project. Keep up the great work"
-        },
+            "id" : 2,
+            "text" : "I liked the way reviews are written"
+        }
+    
         {
-        "text" : "I liked the way reviews are written"
+            "id" : 3,
+            "text" : "This is an excellent project. Keep up the great work"
         }
     ]
-        {
-        "text" : "This is an excellent project. Keep up the great work"
-        }
+}
 
 # Output text will also be in JSON format. Here is an example sent to /all endpoint with the above input text:
 {
     "reviews": [
-        {
+        {   
+            "id" : 1,
             "Criticism": "None",
             "Praise": "None",
             "Problem": "Present",
@@ -56,6 +59,7 @@ https://peerlogic.csc.ncsu.edu/problem for problem detection only
             "text": "I do not like this."
         },
         {
+            "id" : 2,
             "Criticism": "None",
             "Praise": "None",
             "Problem": "Absent",
@@ -67,6 +71,7 @@ https://peerlogic.csc.ncsu.edu/problem for problem detection only
             "text": " bull."
         },
         {
+            "id" : 3,
             "Criticism": "Low",
             "Praise": "None",
             "Problem": "Absent",

@@ -99,6 +99,7 @@ def allJson():
         praise, criticism = predictEmotion(reviews['text'])
         problem = predictProblem(reviews['text'])
         result = {
+            'id': reviews['id'],
             'text': reviews['text'], 
             'Total_volume': total_volume, 
             'Volume_without_stopwords': volume_without_stopwords,
@@ -123,7 +124,7 @@ def volumeJson():
     output = []
     for reviews in review_text:
         total_volume, volume_without_stopwords = predictVolume(reviews['text'])
-        result = {'text': reviews['text'], 'total_volume': total_volume, 'volume_without_stopwords': volume_without_stopwords}
+        result = {'id': reviews['id'],'text': reviews['text'], 'total_volume': total_volume, 'volume_without_stopwords': volume_without_stopwords}
         output.append(result)
     return jsonify ({'reviews':output})
     
@@ -139,7 +140,7 @@ def sentimentJson():
     output = []
     for reviews in review_text:
         sentiment_tone, sentiment_score = predictSentiment(reviews['text'])
-        result = {'text': reviews['text'], 'sentiment_tone': sentiment_tone, 'sentiment_score': sentiment_score}
+        result = {'id': reviews['id'],'text': reviews['text'], 'sentiment_tone': sentiment_tone, 'sentiment_score': sentiment_score}
         output.append(result)
     return jsonify ({'reviews':output})
     
@@ -155,7 +156,7 @@ def emotionsJson():
     output = []
     for reviews in review_text:
         praise, criticism = predictEmotion(reviews['text'])
-        result = {'text': reviews['text'], 'Praise': praise, 'Criticism': criticism}
+        result = {'id': reviews['id'],'text': reviews['text'], 'Praise': praise, 'Criticism': criticism}
         output.append(result)
     return jsonify ({'reviews':output})
 
@@ -170,7 +171,7 @@ def suggestionsJson():
     output = []
     for reviews in review_text:
         suggestions = predictSuggestions(reviews['text'])
-        result = { "text": reviews['text'],"suggestions" : suggestions}
+        result = { 'id': reviews['id'],"text": reviews['text'],"suggestions" : suggestions}
         output.append(result)
     return jsonify({'reviews':output})
 
@@ -183,7 +184,7 @@ def problemJson():
     output = []
     for reviews in review_text:
         problem = predictProblem(reviews['text'])
-        result = { 'text': reviews['text'], "problems": problem}
+        result = { 'id': reviews['id'],'text': reviews['text'], "problems": problem}
         output.append(result)
     return jsonify({'reviews':output})
 
