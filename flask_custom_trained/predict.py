@@ -4,6 +4,7 @@ from keras.preprocessing import sequence, text
 from suggestions_and_problem_preprocessing import load_items, predict_class
 
 import os
+
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
 
 # Google cloud imports
@@ -22,8 +23,6 @@ stop_words = set(stopwords.words('english'))
 stop_words |= {'.', ',', '!', '?'}
 
 
-
-
 # predict sentiment tone and score of the review
 def predictSentiment(review):
     client = language.LanguageServiceClient()
@@ -38,15 +37,15 @@ def predictSentiment(review):
             sentiment_tone = "Neutral"
         else:
             sentiment_tone = "Mixed"
-    return (sentiment_tone, round(sentiment.score, 3))
+    return sentiment_tone, round(sentiment.score, 3)
 
 
 # predict presence and chances of suggestions in the review
 def predictSuggestions(review):
-    model = os.path.abspath('.')    # path to locate the saved Machine Learning models
+    model = os.path.abspath('.')  # path to locate the saved Machine Learning models
     suggestion_model = model + "/model/suggestions_cnn_model.h5"
     suggestions_tokenizer = model + "/model/suggestions_tokenizer"
-    model, tokenizer = load_items(suggestion_model,suggestions_tokenizer)
+    model, tokenizer = load_items(suggestion_model, suggestions_tokenizer)
     predicted_comment = predict_class(review, model, tokenizer, 200)
 
     if predicted_comment == 1:
@@ -93,11 +92,10 @@ def predictEmotion(review):
 # predict presence of problem in the review
 
 def predictProblem(review):
-
     model = os.path.abspath('.')  # path to locate the saved Machine Learning models
     problems_model = model + "/model/problems_cnn_model.h5"
     problems_tokenizer = model + "/model/problems_tokenizer"
-    model, tokenizer = load_items(problems_model,problems_tokenizer)
+    model, tokenizer = load_items(problems_model, problems_tokenizer)
     predicted_comment = predict_class(review, model, tokenizer, 400)
     problem = "None"
     if predicted_comment == 1:
@@ -105,4 +103,3 @@ def predictProblem(review):
     else:
         problem = "Absent"
     return problem
-
