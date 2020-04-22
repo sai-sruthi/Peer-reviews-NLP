@@ -1,5 +1,0 @@
-.idea
-.vscode
-.DS_Store
-env
-/flask_custom_trained/credentials.json
