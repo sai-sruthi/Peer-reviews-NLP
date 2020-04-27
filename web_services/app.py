@@ -1,6 +1,7 @@
 # flask imports
 from flask import Flask, request, render_template, flash, jsonify
 
+
 # import predict functions:
 from predict import predictVolume, predictSentiment, predictSuggestions, predictEmotion, predictProblem
 import os
