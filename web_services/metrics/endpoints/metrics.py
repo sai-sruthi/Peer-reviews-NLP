@@ -1,49 +1,3 @@
-import os
-from flask import Flask, request, render_template, flash, jsonify
-# import predict functions:
-from preprocessing.predict import predictVolume, predictSentiment, predictSuggestions, predictEmotion, predictProblem
-#from  frontend.displayFile import displayMetrics 
-#from endpoints.metrics import Metrics
-from flasgger import Swagger
-from flasgger.utils import swag_from
-
-# simple flask app
-app = Flask(__name__)
-app.config.from_object(__name__)
-app.config['SECRET_KEY'] = '10cr441f27d441f28567d441f2b2018j'
-app.config["SWAGGER"] = {"title": "Swagger - UI", "universion": 2}
-
-swagger_config = {
-    "headers" : [],
-    "specs" : [
-        {
-            "endpoint" : "All",
-            "route" : "/",
-        }
-    ],
-    "static_url_path":"/flasgger_static",
-    "swagger_ui": True,
-    "specs_route" : "/swagger/",
-}
-swagger = Swagger(app, config = swagger_config)
-
-
-@app.route('/', methods=['GET', 'POST'])
-# render the web application page and all it's fields
-def renderPage():
-    review = "Enter Review Text Here!"
-    # Normal page load calls 'GET'. 'POST' gets called when one of the buttons is pressed
-    if request.method == 'POST':
-        # Check which button was pressed
-        if request.form['submit'] == 'Analyze':
-            review = request.form.get("text")
-            displayMetrics(review)
-        elif request.form['submit'] == 'Clear':
-            review = ''
-
-    # Render the HTML template. review gets fed into the textarea variable in the template
-    return render_template('form.html', textarea=review)
-
 
 # Returns text from API request
 def returnReviewText():
@@ -65,7 +19,6 @@ def renderJsonResponse(output):
 
 # route to get all metrics via JSON request
 @app.route('/all', methods=['POST'])
-@swag_from('documentation/all_endpoints.yml')
 def allJson():
     review_text = processJsonRequest()
     output = []
@@ -93,7 +46,6 @@ def allJson():
 
 # route to get only volume metrics via JSON request
 @app.route('/volume', methods=['POST'])
-@swag_from('documentation/volume.yml')
 def volumeJson():
     review_list = processJsonRequest()
     volume_output = []
@@ -107,7 +59,6 @@ def volumeJson():
 
 # route to get only sentiment metrics via JSON request
 @app.route('/sentiment', methods=['POST'])
-@swag_from('documentation/sentiments.yml')
 def sentimentJson():
     review_list = processJsonRequest()
     sentiment_output = []
@@ -121,7 +72,6 @@ def sentimentJson():
 
 # route to get only emotion metrics via JSON request
 @app.route('/emotions', methods=['POST'])
-@swag_from('documentation/emotions.yml')
 def emotionsJson():
     review_list = processJsonRequest()
     emotions_output = []
@@ -134,7 +84,6 @@ def emotionsJson():
 
 # route to get only suggestion metrics via JSON request
 @app.route('/suggestions', methods=['POST'])
-@swag_from('documentation/suggestions.yml')
 def suggestionsJson():
     review_list = processJsonRequest()
     suggestions_output = []
@@ -146,7 +95,6 @@ def suggestionsJson():
 
 
 @app.route('/problem', methods=['POST'])
-@swag_from('documentation/problems.yml')
 def problemJson():
     review_list = processJsonRequest()
     problem_output = []
@@ -155,7 +103,3 @@ def problemJson():
         problem_result = {'id': review['id'], 'text': review['text'], "problems": problem}
         problem_output.append(problem_result)
     return renderJsonResponse(problem_output)
-
-
-if __name__ == '__main__':
-    app.run(debug = True)

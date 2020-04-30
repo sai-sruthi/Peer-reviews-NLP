@@ -1,7 +1,7 @@
 # python and keras imports
 import numpy as np
 from keras.preprocessing import sequence, text
-from suggestions_and_problem_preprocessing import load_items, predict_class
+from preprocessing.suggestions_and_problem_preprocessing import load_items, predict_class
 
 import os
 

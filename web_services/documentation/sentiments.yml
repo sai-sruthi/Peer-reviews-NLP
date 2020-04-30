@@ -1,0 +1,35 @@
+swagger: "2.0"
+
+summary: "Detect sentiments present in the text"
+
+consumes:
+-   "application/json"
+produces:
+-   "application/json"
+parameters:
+-   in: "body"
+    name: "volume"
+    description: "This will fetch the sentiments of the text."
+    required: true
+    schema:
+        type: "object"
+        properties: 
+            reviews:
+                type: array
+                items:
+                    type: object
+                    properties:
+                            id:
+                                description: Unique ID of the text
+                                type: integer
+                            text:
+                                description: The review text for which we need the metrics.
+                                type: string                          
+responses:
+    200:
+        description: "OK"      
+    405:
+        description: "Method not Allowed"
+    404:
+        description: "Resource does not exist"
+    
