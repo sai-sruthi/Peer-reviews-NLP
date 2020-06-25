@@ -126,8 +126,8 @@ def emotionsJson():
     review_list = processJsonRequest()
     emotions_output = []
     for review in review_list:
-        praise, criticism = predictEmotion(review['text'])
-        result = {'id': review['id'], 'text': review['text'], 'Praise': praise, 'Criticism': criticism}
+        praise, criticism,confidence = predictEmotion(review['text'])
+        result = {'id': review['id'], 'text': review['text'], 'Praise': praise, 'Criticism': criticism,"confidence":confidence}
         emotions_output.append(result)
     return renderJsonResponse(emotions_output)
 

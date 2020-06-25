@@ -80,21 +80,27 @@ def predictEmotion(review):
     document = types.Document(content=review, type=enums.Document.Type.PLAIN_TEXT)
     sentiment = client.analyze_sentiment(document=document).document_sentiment
     praise = criticism = "None"
+    predicted_confidence = 0
+
     if 0.6 <= sentiment.magnitude < 1.5:
+        predicted_confidence = 1
         if sentiment.score > 0.25:
             praise = "Low"
         elif sentiment.score < -0.25:
             criticism = "Low"
         else:
             praise = criticism = "Low"
+
     elif sentiment.magnitude >= 1.5:
+        predicted_confidence = 1
         if sentiment.score > 0.25:
             praise = "High"
         elif sentiment.score < -0.25:
             criticism = "High"
         else:
             praise = criticism = "High"
-    return praise, criticism
+
+    return praise, criticism, predicted_confidence
 
 
 # predict presence of problem in the review
