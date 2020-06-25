@@ -112,9 +112,9 @@ def sentimentJson():
     review_list = processJsonRequest()
     sentiment_output = []
     for review in review_list:
-        sentiment_tone, sentiment_score = predictSentiment(review['text'])
+        sentiment_tone, sentiment_score,confidence = predictSentiment(review['text'])
         sentiment_result = {'id': review['id'], 'text': review['text'], 'sentiment_tone': sentiment_tone,
-                            'sentiment_score': sentiment_score}
+                            'sentiment_score': sentiment_score,"confidence":confidence}
         sentiment_output.append(sentiment_result)
     return renderJsonResponse(sentiment_output)
 

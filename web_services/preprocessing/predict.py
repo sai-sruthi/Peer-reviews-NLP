@@ -29,15 +29,21 @@ def predictSentiment(review):
     document = types.Document(content=review, type=enums.Document.Type.PLAIN_TEXT)
     sentiment = client.analyze_sentiment(document=document).document_sentiment
     if sentiment.score > 0.25:
+        predicted_confidence = 1
         sentiment_tone = "Positive"
+
     elif sentiment.score < -0.25:
+        predicted_confidence = 1
         sentiment_tone = "Negative"
+
     else:
         if sentiment.magnitude < 0.6:
+            predicted_confidence = 0
             sentiment_tone = "Neutral"
         else:
+            predicted_confidence = 0
             sentiment_tone = "Mixed"
-    return sentiment_tone, round(sentiment.score, 3)
+    return sentiment_tone, round(sentiment.score, 3), predicted_confidence
 
 
 # predict presence and chances of suggestions in the review
