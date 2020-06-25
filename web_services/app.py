@@ -139,8 +139,8 @@ def suggestionsJson():
     review_list = processJsonRequest()
     suggestions_output = []
     for review in review_list:
-        suggestions = predictSuggestions(review['text'])
-        suggestions_result = {'id': review['id'], "text": review['text'], "suggestions": suggestions}
+        suggestions,confidence = predictSuggestions(review['text'])
+        suggestions_result = {'id': review['id'], "text": review['text'], "suggestions": suggestions,"confidence":confidence}
         suggestions_output.append(suggestions_result)
     return renderJsonResponse(suggestions_output)
 
@@ -151,8 +151,8 @@ def problemJson():
     review_list = processJsonRequest()
     problem_output = []
     for review in review_list:
-        problem = predictProblem(review['text'])
-        problem_result = {'id': review['id'], 'text': review['text'], "problems": problem}
+        problem,confidence = predictProblem(review['text'])
+        problem_result = {'id': review['id'], 'text': review['text'], "problems": problem,"confidence":confidence}
         problem_output.append(problem_result)
     return renderJsonResponse(problem_output)
 

@@ -1,7 +1,7 @@
 # python and keras imports
 import numpy as np
 from keras.preprocessing import sequence, text
-from preprocessing.suggestions_and_problem_preprocessing import load_items, predict_class
+from preprocessing.suggestions_and_problem_preprocessing import load_items, predict_class,predict_confidence
 
 import os
 
@@ -47,12 +47,14 @@ def predictSuggestions(review):
     suggestions_tokenizer = model + "/model/suggestions_tokenizer"
     model, tokenizer = load_items(suggestion_model, suggestions_tokenizer)
     predicted_comment = predict_class(review, model, tokenizer, 200)
+    predicted_confidence = predict_confidence(review, model, tokenizer, 200)
 
     if predicted_comment == 1:
         suggestion = "Present"
     else:
         suggestion = "Absent"
-    return suggestion
+        predicted_confidence = 1 - predicted_confidence
+    return suggestion,predicted_confidence
 
 
 # predict volume metrics of the review
@@ -97,9 +99,11 @@ def predictProblem(review):
     problems_tokenizer = model + "/model/problems_tokenizer"
     model, tokenizer = load_items(problems_model, problems_tokenizer)
     predicted_comment = predict_class(review, model, tokenizer, 400)
+    predicted_confidence = predict_confidence(review, model, tokenizer, 400)
     problem = "None"
     if predicted_comment == 1:
         problem = "Present"
     else:
         problem = "Absent"
-    return problem
+        predicted_confidence = 1 - predicted_confidence
+    return problem,predicted_confidence
