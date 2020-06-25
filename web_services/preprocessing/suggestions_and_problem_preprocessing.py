@@ -70,6 +70,4 @@ def predict_confidence(new_data, model, tokenizer,maxlen):
   new_df = tokenizer.texts_to_sequences(new_df)
   new_df = pad_sequences(new_df, maxlen=maxlen, padding='post', truncating='post') # Set maxlen to 200 for suggestions
   predicted_confidence = float("{:.3f}".format(model.predict_proba(new_df)[0][0]))
-  print("Predicted Confidence " ,flush=True)
-  print(predicted_confidence,flush=True)
   return predicted_confidence  
