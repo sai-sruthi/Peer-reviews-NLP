@@ -85,7 +85,7 @@ def allJson():
             'Suggestions': suggestions,
             'Praise': praise,
             'Criticism': criticism,
-            'Problem': problem
+            'Problem': problem,
             'Confidence': {
                 "Sentiment" : sentiment_confidence, 
                 "Suggestions" : suggestion_confidence,

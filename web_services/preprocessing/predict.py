@@ -1,7 +1,7 @@
 # python and keras imports
 import numpy as np
 from keras.preprocessing import sequence, text
-from preprocessing.suggestions_and_problem_preprocessing import load_items, predict_class,predict_confidence
+from preprocessing.suggestions_and_problem_preprocessing import load_items, predict_class
 
 import os
 
@@ -50,8 +50,7 @@ def predictSuggestions(review):
     suggestion_model = model + "/model/suggestions_cnn_model.h5"
     suggestions_tokenizer = model + "/model/suggestions_tokenizer"
     model, tokenizer = load_items(suggestion_model, suggestions_tokenizer)
-    predicted_comment = predict_class(review, model, tokenizer, 200)
-    predicted_confidence = predict_confidence(review, model, tokenizer, 200)
+    predicted_comment,predicted_confidence = predict_class(review, model, tokenizer, 200)
 
     if predicted_comment == 1:
         suggestion = "Present"
@@ -108,8 +107,7 @@ def predictProblem(review):
     problems_model = model + "/model/problems_cnn_model.h5"
     problems_tokenizer = model + "/model/problems_tokenizer"
     model, tokenizer = load_items(problems_model, problems_tokenizer)
-    predicted_comment = predict_class(review, model, tokenizer, 400)
-    predicted_confidence = predict_confidence(review, model, tokenizer, 400)
+    predicted_comment,predicted_confidence = predict_class(review, model, tokenizer, 400)
     problem = "None"
     if predicted_comment == 1:
         problem = "Present"
