@@ -12,6 +12,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 spell = SpellChecker()
 nltk.download('words')
+from nltk.corpus import words
 def preprocess_review(reviews):
   comment = []
   for i in range(len(reviews)):
