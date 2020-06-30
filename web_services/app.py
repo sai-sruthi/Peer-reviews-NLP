@@ -96,6 +96,30 @@ def allJson():
         output.append(result)
     return jsonify({'reviews': output})
 
+# route to get all confidence metrics via JSON request
+@app.route('/all_confidence', methods=['POST'])
+@swag_from('documentation/all_endpoints.yml')
+def allConfidenceJson():
+    review_text = processJsonRequest()
+    output = []
+    for reviews in review_text:
+        sentiment_tone, sentiment_score, sentiment_confidence = predictSentiment(reviews['text'])
+        suggestions, suggestion_confidence = predictSuggestions(reviews['text'])
+        praise, criticism, emotion_confidence = predictEmotion(reviews['text'])
+        problem, problem_confidence = predictProblem(reviews['text'])
+        result = {
+            'id': reviews['id'],
+            'text': reviews['text'],
+            'Confidence': {
+                "Sentiment" : sentiment_confidence, 
+                "Suggestions" : suggestion_confidence,
+                "Emotion" : emotion_confidence,
+                "Problem" : problem_confidence
+            }
+        }
+        output.append(result)
+    return jsonify({'reviews': output})
+
 
 # route to get only volume metrics via JSON request
 @app.route('/volume', methods=['POST'])
@@ -124,6 +148,18 @@ def sentimentJson():
         sentiment_output.append(sentiment_result)
     return renderJsonResponse(sentiment_output)
 
+# route to get only sentiment confidence metrics via JSON request
+@app.route('/sentiment_confidence', methods=['POST'])
+@swag_from('documentation/sentiments.yml')
+def sentimentConfidenceJson():
+    review_list = processJsonRequest()
+    sentiment_confidence_output = []
+    for review in review_list:
+        sentiment_tone, sentiment_score,confidence = predictSentiment(review['text'])
+        sentiment_result = {'id': review['id'], 'text': review['text'],"confidence":confidence}
+        sentiment_confidence_output.append(sentiment_result)
+    return renderJsonResponse(sentiment_confidence_output)
+
 
 # route to get only emotion metrics via JSON request
 @app.route('/emotions', methods=['POST'])
@@ -136,6 +172,18 @@ def emotionsJson():
         result = {'id': review['id'], 'text': review['text'], 'Praise': praise, 'Criticism': criticism,"confidence":confidence}
         emotions_output.append(result)
     return renderJsonResponse(emotions_output)
+
+# route to get only emotion confidence metrics via JSON request
+@app.route('/emotions_confidence', methods=['POST'])
+@swag_from('documentation/emotions.yml')
+def emotionsConfidenceJson():
+    review_list = processJsonRequest()
+    emotions_confidence_output = []
+    for review in review_list:
+        praise, criticism,confidence = predictEmotion(review['text'])
+        result = {'id': review['id'], 'text': review['text'],"confidence":confidence}
+        emotions_confidence_output.append(result)
+    return renderJsonResponse(emotions_confidence_output)
 
 
 # route to get only suggestion metrics via JSON request
@@ -150,7 +198,19 @@ def suggestionsJson():
         suggestions_output.append(suggestions_result)
     return renderJsonResponse(suggestions_output)
 
+# route to get only suggestion metrics via JSON request
+@app.route('/suggestions_confidence', methods=['POST'])
+@swag_from('documentation/suggestions.yml')
+def suggestionsConfidenceJson():
+    review_list = processJsonRequest()
+    suggestions_confidence_output = []
+    for review in review_list:
+        suggestions,confidence = predictSuggestions(review['text'])
+        suggestions_result = {'id': review['id'], "text": review['text'],"confidence":confidence}
+        suggestions_confidence_output.append(suggestions_result)
+    return renderJsonResponse(suggestions_confidence_output)
 
+# route to get only problem metrics via JSON request
 @app.route('/problem', methods=['POST'])
 @swag_from('documentation/problems.yml')
 def problemJson():
@@ -161,6 +221,18 @@ def problemJson():
         problem_result = {'id': review['id'], 'text': review['text'], "problems": problem,"confidence":confidence}
         problem_output.append(problem_result)
     return renderJsonResponse(problem_output)
+
+# route to get only problem confidence metrics via JSON request
+@app.route('/problem_confidence', methods=['POST'])
+@swag_from('documentation/problems.yml')
+def problemConfidenceJson():
+    review_list = processJsonRequest()
+    problem_confidence_output = []
+    for review in review_list:
+        problem,confidence = predictProblem(review['text'])
+        problem_result = {'id': review['id'], 'text': review['text'],"confidence":confidence}
+        problem_confidence_output.append(problem_result)
+    return renderJsonResponse(problem_confidence_output)
 
 
 if __name__ == '__main__':
