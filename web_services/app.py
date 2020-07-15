@@ -136,7 +136,7 @@ def sentimentJson():
     review_list = processJsonRequest()
     sentiment_output = []
     for review in review_list:
-        sentiment_tone, sentiment_score,confidence = predictSentiment(review['text'])
+        sentiment_tone, sentiment_score, confidence = predictSentiment(review['text'])
         sentiment_result = {'id': review['id'], 'text': review['text'], 'sentiment_tone': sentiment_tone,
                             'sentiment_score': sentiment_score}
         sentiment_output.append(sentiment_result)
@@ -149,7 +149,7 @@ def sentimentConfidenceJson():
     review_list = processJsonRequest()
     sentiment_confidence_output = []
     for review in review_list:
-        sentiment_tone, sentiment_score,confidence = predictSentiment(review['text'])
+        sentiment_tone, sentiment_score, confidence = predictSentiment(review['text'])
         sentiment_result = {'id': review['id'], 'text': review['text'],"confidence":confidence}
         sentiment_confidence_output.append(sentiment_result)
     return renderJsonResponse(sentiment_confidence_output)
@@ -162,7 +162,7 @@ def emotionsJson():
     review_list = processJsonRequest()
     emotions_output = []
     for review in review_list:
-        praise, criticism,confidence = predictEmotion(review['text'])
+        praise, criticism, confidence = predictEmotion(review['text'])
         result = {'id': review['id'], 'text': review['text'], 'Praise': praise, 'Criticism': criticism}
         emotions_output.append(result)
     return renderJsonResponse(emotions_output)
@@ -174,7 +174,7 @@ def emotionsConfidenceJson():
     review_list = processJsonRequest()
     emotions_confidence_output = []
     for review in review_list:
-        praise, criticism,confidence = predictEmotion(review['text'])
+        praise, criticism, confidence = predictEmotion(review['text'])
         result = {'id': review['id'], 'text': review['text'],"confidence":confidence}
         emotions_confidence_output.append(result)
     return renderJsonResponse(emotions_confidence_output)
@@ -187,7 +187,7 @@ def suggestionsJson():
     review_list = processJsonRequest()
     suggestions_output = []
     for review in review_list:
-        suggestions,confidence = predictSuggestions(review['text'])
+        suggestions, confidence = predictSuggestions(review['text'])
         suggestions_result = {'id': review['id'], "text": review['text'], "suggestions": suggestions}
         suggestions_output.append(suggestions_result)
     return renderJsonResponse(suggestions_output)
@@ -199,7 +199,7 @@ def suggestionsConfidenceJson():
     review_list = processJsonRequest()
     suggestions_confidence_output = []
     for review in review_list:
-        suggestions,confidence = predictSuggestions(review['text'])
+        suggestions, confidence = predictSuggestions(review['text'])
         suggestions_result = {'id': review['id'], "text": review['text'],"confidence":confidence}
         suggestions_confidence_output.append(suggestions_result)
     return renderJsonResponse(suggestions_confidence_output)
@@ -211,7 +211,7 @@ def problemJson():
     review_list = processJsonRequest()
     problem_output = []
     for review in review_list:
-        problem,confidence = predictProblem(review['text'])
+        problem, confidence = predictProblem(review['text'])
         problem_result = {'id': review['id'], 'text': review['text'], "problems": problem}
         problem_output.append(problem_result)
     return renderJsonResponse(problem_output)
@@ -223,7 +223,7 @@ def problemConfidenceJson():
     review_list = processJsonRequest()
     problem_confidence_output = []
     for review in review_list:
-        problem,confidence = predictProblem(review['text'])
+        problem, confidence = predictProblem(review['text'])
         problem_result = {'id': review['id'], 'text': review['text'],"confidence":confidence}
         problem_confidence_output.append(problem_result)
     return renderJsonResponse(problem_confidence_output)

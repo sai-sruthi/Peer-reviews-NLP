@@ -53,10 +53,12 @@ def preprocess_review(reviews):
       reviews[i] = reviews[i].replace(' ', '', 1)
     comment.append(reviews[i])
   return comment[0]
+
 def load_items(filepath_model, filepath_tokenizer):
   model = load_model(filepath_model) # May need to alter filepath
   tokenizer = pickle.load(open(filepath_tokenizer, 'rb')) # May need to alter filepath
   return model, tokenizer
+
 def predict_class(new_data, model, tokenizer,maxlen):
   new_data = preprocess_review([new_data])
   new_df = (pd.DataFrame([new_data]))[0]
@@ -64,4 +66,4 @@ def predict_class(new_data, model, tokenizer,maxlen):
   new_df = pad_sequences(new_df, maxlen=maxlen, padding='post', truncating='post') # Set maxlen to 200 for suggestions
   predicted = int(model.predict_classes(new_df))
   predicted_confidence = float("{:.3f}".format(model.predict_proba(new_df)[0][0]))
-  return predicted,predicted_confidence 
+  return predicted, predicted_confidence 

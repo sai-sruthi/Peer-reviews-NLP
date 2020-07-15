@@ -50,14 +50,14 @@ def predictSuggestions(review):
     suggestion_model = model + "/model/suggestions_cnn_model.h5"
     suggestions_tokenizer = model + "/model/suggestions_tokenizer"
     model, tokenizer = load_items(suggestion_model, suggestions_tokenizer)
-    predicted_comment,predicted_confidence = predict_class(review, model, tokenizer, 200)
+    predicted_comment, predicted_confidence = predict_class(review, model, tokenizer, 200)
 
     if predicted_comment == 1:
         suggestion = "Present"
     else:
         suggestion = "Absent"
         predicted_confidence = 1 - predicted_confidence
-    return suggestion,predicted_confidence
+    return suggestion, predicted_confidence
 
 
 # predict volume metrics of the review
@@ -107,11 +107,11 @@ def predictProblem(review):
     problems_model = model + "/model/problems_cnn_model.h5"
     problems_tokenizer = model + "/model/problems_tokenizer"
     model, tokenizer = load_items(problems_model, problems_tokenizer)
-    predicted_comment,predicted_confidence = predict_class(review, model, tokenizer, 400)
+    predicted_comment, predicted_confidence = predict_class(review, model, tokenizer, 400)
     problem = "None"
     if predicted_comment == 1:
         problem = "Present"
     else:
         problem = "Absent"
         predicted_confidence = 1 - predicted_confidence
-    return problem,predicted_confidence
+    return problem, predicted_confidence
