@@ -1,7 +1,7 @@
 # python and keras imports
 import numpy as np
 from keras.preprocessing import sequence, text
-from preprocessing.suggestions_and_problem_preprocessing import load_items, predict_class
+from preprocessing.suggestions_and_problem_preprocessing import predict_class
 
 import os
 
@@ -43,22 +43,16 @@ def predictSentiment(review):
             sentiment_tone = "Mixed"
     return sentiment_tone, round(sentiment.score, 3), predicted_confidence
 
-
-# predict presence and chances of suggestions in the review
-def predictSuggestions(review):
-    model = os.path.abspath('.')  # path to locate the saved Machine Learning models
-    suggestion_model = model + "/model/suggestions_cnn_model.h5"
-    suggestions_tokenizer = model + "/model/suggestions_tokenizer"
-    model, tokenizer = load_items(suggestion_model, suggestions_tokenizer)
-    predicted_comment, predicted_confidence = predict_class(review, model, tokenizer, 200)
-
+# predict model metrics of the review
+def predictMetric(review, model, tokenizer):
+    output = []
+    predicted_comment, predicted_confidence = predict_class(review['text'], model, tokenizer, 200)
     if predicted_comment == 1:
-        suggestion = "Present"
+        metric_value = "Present"
     else:
-        suggestion = "Absent"
+        metric_value = "Absent"
         predicted_confidence = 1 - predicted_confidence
-    return suggestion, predicted_confidence
-
+    return metric_value, predicted_confidence
 
 # predict volume metrics of the review
 def predictVolume(review):
@@ -99,19 +93,3 @@ def predictEmotion(review):
 
     return praise, criticism, predicted_confidence
 
-
-# predict presence of problem in the review
-
-def predictProblem(review):
-    model = os.path.abspath('.')  # path to locate the saved Machine Learning models
-    problems_model = model + "/model/problems_cnn_model.h5"
-    problems_tokenizer = model + "/model/problems_tokenizer"
-    model, tokenizer = load_items(problems_model, problems_tokenizer)
-    predicted_comment, predicted_confidence = predict_class(review, model, tokenizer, 400)
-    problem = "None"
-    if predicted_comment == 1:
-        problem = "Present"
-    else:
-        problem = "Absent"
-        predicted_confidence = 1 - predicted_confidence
-    return problem, predicted_confidence

@@ -1,11 +1,10 @@
 import os
 from flask import Flask, request, render_template, flash, jsonify
-# import predict functions:
-from preprocessing.predict import predictVolume, predictSentiment, predictSuggestions, predictEmotion, predictProblem
-#from  frontend.displayFile import displayMetrics 
-#from endpoints.metrics import Metrics
+from preprocessing.predict import predictVolume, predictSentiment, predictEmotion, predictMetric
+from preprocessing.suggestions_and_problem_preprocessing import load_items
 from flasgger import Swagger
 from flasgger.utils import swag_from
+
 
 # simple flask app
 app = Flask(__name__)
@@ -27,6 +26,11 @@ swagger_config = {
 }
 swagger = Swagger(app, config = swagger_config)
 
+model = os.path.abspath('.')  # path to locate the saved Machine Learning models
+suggestions_model = model + "/model/suggestions_cnn_model.h5"
+suggestions_tokenizer = model + "/model/suggestions_tokenizer"
+problems_model = model + "/model/problems_cnn_model.h5"
+problems_tokenizer = model + "/model/problems_tokenizer"
 
 @app.route('/', methods=['GET', 'POST'])
 # render the web application page and all it's fields
@@ -69,12 +73,14 @@ def renderJsonResponse(output):
 def allJson():
     review_text = processJsonRequest()
     output = []
+    suggestions_model, suggestions_tokenizer = load_items(suggestions_model, suggestions_tokenizer)
+    problems_model, problems_tokenizer = load_items(problems_model, problems_tokenizer)  
     for reviews in review_text:
         total_volume, volume_without_stopwords = predictVolume(reviews['text'])
         sentiment_tone, sentiment_score, sentiment_confidence = predictSentiment(reviews['text'])
-        suggestions, suggestion_confidence = predictSuggestions(reviews['text'])
+        suggestions, suggestion_confidence = predictMetric(reviews['text'], suggestions_model, suggestions_tokenizer)
         praise, criticism, emotion_confidence = predictEmotion(reviews['text'])
-        problem, problem_confidence = predictProblem(reviews['text'])
+        problem, problem_confidence = predictMetric(reviews['text'], problems_model, problems_tokenizer)
         result = {
             'id': reviews['id'],
             'text': reviews['text'],
@@ -96,11 +102,13 @@ def allJson():
 def allConfidenceJson():
     review_text = processJsonRequest()
     output = []
+    suggestions_model, suggestions_tokenizer = load_items(suggestions_model, suggestions_tokenizer)
+    problems_model, problems_tokenizer = load_items(problems_model, problems_tokenizer)
     for reviews in review_text:
         sentiment_tone, sentiment_score, sentiment_confidence = predictSentiment(reviews['text'])
-        suggestions, suggestion_confidence = predictSuggestions(reviews['text'])
+        suggestions, suggestion_confidence = predictMetric(reviews['text'], suggestions_model, suggestions_tokenizer)
         praise, criticism, emotion_confidence = predictEmotion(reviews['text'])
-        problem, problem_confidence = predictProblem(reviews['text'])
+        problem, problem_confidence = predictMetric(reviews['text'], problems_model, problems_tokenizer)
         result = {
             'id': reviews['id'],
             'text': reviews['text'],
@@ -186,8 +194,9 @@ def emotionsConfidenceJson():
 def suggestionsJson():
     review_list = processJsonRequest()
     suggestions_output = []
+    suggestions_model, suggestions_tokenizer = load_items(suggestions_model, suggestions_tokenizer)
     for review in review_list:
-        suggestions, confidence = predictSuggestions(review['text'])
+        suggestions, confidence = predictMetric(review['text'],suggestions_model, suggestions_tokenizer)
         suggestions_result = {'id': review['id'], "text": review['text'], "suggestions": suggestions}
         suggestions_output.append(suggestions_result)
     return renderJsonResponse(suggestions_output)
@@ -198,8 +207,9 @@ def suggestionsJson():
 def suggestionsConfidenceJson():
     review_list = processJsonRequest()
     suggestions_confidence_output = []
+    suggestions_model, suggestions_tokenizer = load_items(suggestions_model, suggestions_tokenizer)
     for review in review_list:
-        suggestions, confidence = predictSuggestions(review['text'])
+        suggestions, confidence = predictMetric(review['text'],suggestions_model, suggestions_tokenizer)
         suggestions_result = {'id': review['id'], "text": review['text'],"confidence":confidence}
         suggestions_confidence_output.append(suggestions_result)
     return renderJsonResponse(suggestions_confidence_output)
@@ -210,8 +220,9 @@ def suggestionsConfidenceJson():
 def problemJson():
     review_list = processJsonRequest()
     problem_output = []
+    problems_model, problems_tokenizer = load_items(problems_model, problems_tokenizer)
     for review in review_list:
-        problem, confidence = predictProblem(review['text'])
+        problem, confidence = predictMetric(review['text'], problems_model, problems_tokenizer)
         problem_result = {'id': review['id'], 'text': review['text'], "problems": problem}
         problem_output.append(problem_result)
     return renderJsonResponse(problem_output)
@@ -222,8 +233,9 @@ def problemJson():
 def problemConfidenceJson():
     review_list = processJsonRequest()
     problem_confidence_output = []
+    problems_model, problems_tokenizer = load_items(problems_model, problems_tokenizer)
     for review in review_list:
-        problem, confidence = predictProblem(review['text'])
+        problem, confidence = predictMetric(review['text'], problems_model, problems_tokenizer)
         problem_result = {'id': review['id'], 'text': review['text'],"confidence":confidence}
         problem_confidence_output.append(problem_result)
     return renderJsonResponse(problem_confidence_output)
