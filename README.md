@@ -24,7 +24,7 @@ https://peerlogic.csc.ncsu.edu/problem for problem detection only
 
 
 # Input text is to be given in the following JSON format:
-{
+``` {
 	"reviews": 
     [
         {
@@ -34,7 +34,7 @@ https://peerlogic.csc.ncsu.edu/problem for problem detection only
         {
             "id" : 2,
             "text" : "I liked the way reviews are written"
-        }
+        },
     
         {
             "id" : 3,
@@ -42,9 +42,11 @@ https://peerlogic.csc.ncsu.edu/problem for problem detection only
         }
     ]
 }
+```
 
 # Output text will also be in JSON format. Here is an example sent to /all endpoint with the above input text:
-{
+
+```{
     "reviews": [
         {   
             "id" : 1,
@@ -84,3 +86,4 @@ https://peerlogic.csc.ncsu.edu/problem for problem detection only
         }
     ]
 }
+```
